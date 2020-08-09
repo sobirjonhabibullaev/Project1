@@ -1,8 +1,7 @@
 Vue.component('product', {
     props: {
         premium: {
-            type: Boolean,
-            default: true
+            type: Boolean
         }
     },
 
@@ -16,7 +15,7 @@ Vue.component('product', {
                 <h1>{{ title }}</h1>
                 <p v-if="inStock">In Stock</p>
                 <p v-else>Out of Stock</p>
-                <p>Shipping: {{premium}}</p>
+                <p>Shipping: {{shipping}}</p>
                 <ul>
                     <li v-for="detail in details">{{detail}}</li>
                 </ul>
@@ -74,6 +73,14 @@ Vue.component('product', {
         },
         inStock() {
             return this.variants[this.selectedVariant].variantQuantity
+        },
+        shipping(YorN) {
+            this.premium = this.inStock
+            if (this.premium) {
+                return "free"
+            } else {
+                return 7.92
+            }
         }
     }
 
@@ -83,8 +90,6 @@ Vue.component('product', {
 
 var app = new Vue({
     el: '#app',
-    data: {
-        premium: true
-    }
+
 
 })
