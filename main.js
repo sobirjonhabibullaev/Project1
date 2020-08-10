@@ -1,83 +1,103 @@
-<html>
+Vue.component('product', {
+    props: {
+        premium: {
+            type: Boolean,
+            default: true
+        }
+    },
 
-<head>
-    <title>Bozorboy Socks</title>
-
-    <!-- CSS links named styles.css -->
-    <link rel="stylesheet" href="styles.css">
-
-    <!-- VueJS CDN link -->
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="bootstrap.min.js">
-
-    <!-- JS, Popper.js, and jQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
-</head>
-
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light" style="background:-webkit-gradient(radial, 187 195, 0, 220 -152, 465, from(#00FF9C), to(#5DFF73))">
-        <a class="navbar-brand" href="#">Navbar</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Dropdown
-              </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled" href="#">Disabled</a>
-                </li>
-            </ul>
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Search</button>
-            </form>
-        </div>
-    </nav>
-
-    <div id="app">
-
-        <div class="row">
-            <div class="col-2"></div>
-            <div class="col-6">
-                <product :premium="premium" @add-to-cart="updateCart"> </product>
-                <div class="cart">
-                    <p>Cart({{cart.length}})</p>
-                </div>
+    template: `<div class="product">
+            <div class="product-image">
+                <img :src="image" />
+               
             </div>
-            <div class="col-2"></div>
 
-        </div>
+            <div class="product-info">
+
+                <h1>{{ title }}</h1>
+                <p v-if="inStock">In Stock</p>
+                <p v-else>Out of Stock</p>
+                <p :class="{shipping: !inStock}">Shipping: {{shipping}}</p>
+                <ul>
+                    <li v-for="detail in details">{{detail}}</li>
+                </ul>
+                
+                <div class="color-box" v-for="(variant, index) in variants" :key="variant.variantId" :style="{'background-color': variant.variantColor}" @mouseover="updateProduct(index)">
+                </div>
+                <div>
+                    <button v-on:click="addCart" :disabled="!inStock" :class="{disabledButton: !inStock}">Add to Cart</button>
+
+                    
+                </div>
+
+            </div>
+        </div>`,
+
+    data() {
+
+        return {
+            brand: "Bozorboy",
+            product: 'Socks',
+            selectedVariant: 0,
+            cart: 0,
+            details: ['80% cotton', '20% polyester', 'Gender-neutral'],
+            variants: [{
+                variantId: 010,
+                variantColor: "green",
+                variantImage: "https://www.vuemastery.com/images/challenges/vmSocks-green-onWhite.jpg",
+                variantQuantity: 10
+            }, {
+                variantId: 111,
+                variantColor: "blue",
+                variantImage: "https://www.vuemastery.com/images/challenges/vmSocks-blue-onWhite.jpg",
+                variantQuantity: 0
+            }]
+        }
+    },
+
+    methods: {
+        addCart: function() {
+            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId)
+        },
+
+        updateProduct: function(index) {
+            this.selectedVariant = index
+                //console.log(index)
+        }
+    },
+    computed: {
+        title() {
+            return this.brand + " " + this.product
+        },
+        image() {
+            return this.variants[this.selectedVariant].variantImage
+        },
+        inStock() {
+            return this.variants[this.selectedVariant].variantQuantity
+        },
+        shipping() {
+            if (this.premium) {
+                return "free"
+            } else {
+                return 7.92
+            }
+        }
+    }
+
+})
 
 
 
-
-    </div>
-
-
-
-    <!-- VueJS codes' link named main.js -->
-    <script src="main.js"></script>
-
-</body>
-
-</html>
+var app = new Vue({
+    el: '#app',
+    data: {
+        premium: false,
+        cart: []
+    },
+    methods: {
+        updateCart(id) {
+            this.cart.push(id)
+                // console.log(cart)
+        }
+    }
+})
